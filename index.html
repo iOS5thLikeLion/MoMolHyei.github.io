@@ -17,6 +17,9 @@
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         .selected {
             background-color: #4CAF50;
@@ -24,11 +27,26 @@
         }
         #controls, #history {
             margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
         }
         button {
             margin: 0 10px;
             padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
+        }
+        #read-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #stop-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
         }
         #history-list {
             list-style-type: none;
@@ -36,11 +54,12 @@
         }
         #history-list li {
             margin: 10px 0;
-            padding: 5px;
+            padding: 10px;
             background-color: #f0f0f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 5px;
         }
         .delete-btn {
             background-color: #ff4444;
@@ -48,6 +67,7 @@
             border: none;
             padding: 5px 10px;
             cursor: pointer;
+            border-radius: 3px;
         }
     </style>
 </head>
