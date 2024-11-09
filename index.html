@@ -86,15 +86,15 @@
             border-radius: 5px;
         }
         .delete-btn, .read-history-btn, .use-sentence-btn {
-            background-color: #ff4444;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
+            background-color: #ff4444; /* 기본 삭제 버튼 색상 */
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            cursor: pointer; 
+            border-radius: 3px; 
         }
         .read-history-btn, .use-sentence-btn {
-            background-color: #2196F3;
+             background-color:#2196F3; /* 사용 버튼 색상 */
         }
     </style>
 </head>
@@ -125,155 +125,166 @@
         const addSentenceButton = document.getElementById('add-sentence-button');
         const sentenceList = document.getElementById('sentence-list');
         const sentenceContainer = document.getElementById('sentence-container');
+        
         const readButton = document.getElementById('read-button');
         const stopButton = document.getElementById('stop-button');
         const resetButton = document.getElementById('reset-button');
+        
         const historyList = document.getElementById('history-list');
         
         let currentSentence = "";
         let selectedWords = [];
+        
         let utterance = new SpeechSynthesisUtterance();
-        let readingHistory = [];
+        
+        // 로컬 스토리지에서 문장과 히스토리 불러오기
         let savedSentences = JSON.parse(localStorage.getItem('savedSentences')) || [];
+        let readingHistory = JSON.parse(localStorage.getItem('readingHistory')) || [];
 
-        addSentenceButton.addEventListener('click', addSentence);
-
-        function addSentence() {
-            const newSentence = sentenceInput.value.trim();
-            if (newSentence) {
-                savedSentences.push(newSentence);
-                updateSentenceList();
-                saveSentencesToLocalStorage();
-                sentenceInput.value = '';
-            }
-        }
-
-        function updateSentenceList() {
-            sentenceList.innerHTML = '';
-            savedSentences.forEach((sentence, index) => {
-                const li = document.createElement('li');
-                li.textContent = sentence;
-
-                const useBtn = document.createElement('button');
-                useBtn.textContent = 'Use';
-                useBtn.classList.add('use-sentence-btn');
-                useBtn.addEventListener('click', () => useSentence(sentence));
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.addEventListener('click', () => deleteSentence(index));
-
-                li.appendChild(useBtn);
-                li.appendChild(deleteBtn);
-                sentenceList.appendChild(li);
-            });
-        }
-
-        function useSentence(sentence) {
-            currentSentence = sentence;
-            updateSentenceDisplay();
-        }
-
-        function deleteSentence(index) {
-            savedSentences.splice(index, 1);
-            updateSentenceList();
-            saveSentencesToLocalStorage();
-        }
-
-        function updateSentenceDisplay() {
-            sentenceContainer.innerHTML = '';
-            const words = currentSentence.split(' ');
-            words.forEach(word => {
-                const button = document.createElement('button');
-                button.textContent = word;
-                button.classList.add('word-button');
-                button.addEventListener('click', () => toggleWord(button, word));
-                sentenceContainer.appendChild(button);
-            });
-            selectedWords = [];
-        }
-
-        function toggleWord(button, word) {
-            button.classList.toggle('selected');
-            const index = selectedWords.indexOf(word);
-            if (index > -1) {
-                selectedWords.splice(index, 1);
-            } else {
-                selectedWords.push(word);
-            }
-        }
-
-        readButton.addEventListener('click', () => {
-            if (selectedWords.length > 0) {
-                const selectedPhrase = selectedWords.join(' ');
-                utterance.text = selectedPhrase;
-                speechSynthesis.speak(utterance);
-                addToHistory(selectedPhrase);
-            }
-        });
-
-        stopButton.addEventListener('click', () => {
-            speechSynthesis.cancel();
-        });
-
-        resetButton.addEventListener('click', () => {
-            resetSelectedWords();
-        });
-
-        function addToHistory(phrase) {
-            readingHistory.push(phrase);
-            updateHistoryDisplay();
-        }
-
-        function updateHistoryDisplay() {
-            historyList.innerHTML = '';
-            readingHistory.forEach((phrase, index) => {
-                const li = document.createElement('li');
-                li.textContent = phrase;
-
-                const readBtn = document.createElement('button');
-                readBtn.textContent = 'Read';
-                readBtn.classList.add('read-history-btn');
-                readBtn.addEventListener('click', () => readFromHistory(phrase));
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.addEventListener('click', () => deleteHistoryItem(index));
-
-                li.appendChild(readBtn);
-                li.appendChild(deleteBtn);
-                historyList.appendChild(li);
-            });
-        }
-
-        function deleteHistoryItem(index) {
-            readingHistory.splice(index, 1);
-            updateHistoryDisplay();
-        }
-
-        function readFromHistory(phrase) {
-            utterance.text = phrase;
-            speechSynthesis.speak(utterance);
-        }
-
-        function resetSelectedWords() {
-            selectedWords = [];
-            const buttons = document.querySelectorAll('.word-button');
-            buttons.forEach(button => {
-                button.classList.remove('selected');
-            });
-        }
-
-        function saveSentencesToLocalStorage() {
-            localStorage.setItem('savedSentences', JSON.stringify(savedSentences));
-        }
-
-        // 페이지 로드 시 저장된 문장 불러오기
+        // 페이지 로드 시 문장과 히스토리 업데이트
         window.addEventListener('load', () => {
-            updateSentenceList();
-        });
-    </script>
+             updateSentenceList();
+             updateHistoryDisplay();
+         });
+
+         addSentenceButton.addEventListener('click', addSentence);
+
+         function addSentence() {
+             const newSentence = sentenceInput.value.trim();
+             if (newSentence) {
+                 savedSentences.push(newSentence);
+                 updateSentenceList();
+                 saveSentencesToLocalStorage();
+                 sentenceInput.value = '';
+             }
+         }
+
+         function updateSentenceList() {
+             sentenceList.innerHTML = '';
+             savedSentences.forEach((sentence, index) => {
+                 const li = document.createElement('li');
+                 li.textContent = sentence;
+
+                 const useBtn = document.createElement('button');
+                 useBtn.textContent = 'Use';
+                 useBtn.classList.add('use-sentence-btn');
+                 useBtn.addEventListener('click', () => useSentence(sentence));
+
+                 const deleteBtn = document.createElement('button');
+                 deleteBtn.textContent = 'Delete';
+                 deleteBtn.classList.add('delete-btn');
+                 deleteBtn.addEventListener('click', () => deleteSentence(index));
+
+                 li.appendChild(useBtn);
+                 li.appendChild(deleteBtn);
+                 sentenceList.appendChild(li);
+             });
+         }
+
+         function useSentence(sentence) {
+             currentSentence = sentence; // 현재 문장으로 설정
+             updateSentenceDisplay();
+         }
+
+         function deleteSentence(index) {
+             savedSentences.splice(index, 1); // 문장 삭제
+             updateSentenceList(); // 리스트 업데이트
+             saveSentencesToLocalStorage(); // 로컬 스토리지 업데이트
+         }
+
+         function updateSentenceDisplay() {
+             sentenceContainer.innerHTML = ''; // 현재 문장 표시 영역 초기화
+             const words = currentSentence.split(' '); // 단어로 분리
+             words.forEach(word => {
+                const button = document.createElement('button'); // 단어 버튼 생성
+                button.textContent = word; 
+                button.classList.add('word-button'); 
+                button.addEventListener('click', () => toggleWord(button, word)); 
+                sentenceContainer.appendChild(button); 
+             });
+             selectedWords = []; // 선택된 단어 초기화
+         }
+
+         function toggleWord(button, word) { 
+             button.classList.toggle('selected'); 
+             const index = selectedWords.indexOf(word); 
+             if (index > -1) { 
+                selectedWords.splice(index, 1); 
+             } else { 
+                selectedWords.push(word); 
+             } 
+         }
+
+         readButton.addEventListener('click', () => { 
+             if (selectedWords.length > 0) { 
+                const selectedPhrase = selectedWords.join(' '); 
+                utterance.text = selectedPhrase; 
+                speechSynthesis.speak(utterance); 
+                addToHistory(selectedPhrase); 
+              } 
+          });
+
+          stopButton.addEventListener('click', () => { 
+              speechSynthesis.cancel(); 
+          });
+
+          resetButton.addEventListener('click', () => { 
+              resetSelectedWords(); 
+          });
+
+          function addToHistory(phrase) { 
+              readingHistory.push(phrase); 
+              updateHistoryDisplay(); 
+              saveHistoryToLocalStorage(); // 히스토리 저장
+          }
+
+          function updateHistoryDisplay() { 
+              historyList.innerHTML = ''; 
+              readingHistory.forEach((phrase, index) => { 
+                  const li = document.createElement('li'); 
+                  li.textContent = phrase;
+
+                  const readBtn = document.createElement('button'); 
+                  readBtn.textContent = 'Read'; 
+                  readBtn.classList.add('read-history-btn'); 
+                  readBtn.addEventListener('click', () => readFromHistory(phrase)); 
+
+                  const deleteBtn = document.createElement('button'); 
+                  deleteBtn.textContent = 'Delete'; 
+                  deleteBtn.classList.add('delete-btn'); 
+                  deleteBtn.addEventListener('click', () => deleteHistoryItem(index)); 
+
+                  li.appendChild(readBtn); 
+                  li.appendChild(deleteBtn); 
+                  historyList.appendChild(li); 
+              }); 
+          }
+
+          function deleteHistoryItem(index) { 
+              readingHistory.splice(index, 1); // 히스토리 항목 삭제
+              updateHistoryDisplay(); // 히스토리 업데이트
+              saveHistoryToLocalStorage(); // 로컬 스토리지 업데이트
+          }
+
+          function readFromHistory(phrase) { 
+              utterance.text = phrase; // 히스토리 항목 읽기
+              speechSynthesis.speak(utterance); 
+          }
+
+          function resetSelectedWords() { // 선택된 단어 초기화
+              selectedWords = []; 
+              const buttons = document.querySelectorAll('.word-button'); // 모든 단어 버튼 가져오기
+              buttons.forEach(button => { button.classList.remove('selected'); }); // 선택 해제
+          }
+
+          function saveSentencesToLocalStorage() { // 문장을 로컬 스토리지에 저장하는 함수
+              localStorage.setItem('savedSentences', JSON.stringify(savedSentences));
+          }
+
+          function saveHistoryToLocalStorage() { // 히스토리를 로컬 스토리지에 저장하는 함수
+              localStorage.setItem('readingHistory', JSON.stringify(readingHistory));
+          }
+
+     </script>
 </body>
 </html>
