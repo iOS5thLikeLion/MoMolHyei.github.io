@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentence Reader</title>
+    <title>Sentence Reader and History</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,13 +22,32 @@
             background-color: #4CAF50;
             color: white;
         }
-        #controls {
+        #controls, #history {
             margin-top: 20px;
         }
         button {
             margin: 0 10px;
             padding: 10px 20px;
             font-size: 16px;
+        }
+        #history-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #history-list li {
+            margin: 10px 0;
+            padding: 5px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -38,6 +57,10 @@
         <button id="read-button">Read Selected</button>
         <button id="stop-button">Stop</button>
     </div>
+    <div id="history">
+        <h3>Reading History</h3>
+        <ul id="history-list"></ul>
+    </div>
 
     <script>
         const sentence = "You can't let people walk all over you";
@@ -45,8 +68,10 @@
         const sentenceContainer = document.getElementById('sentence-container');
         const readButton = document.getElementById('read-button');
         const stopButton = document.getElementById('stop-button');
+        const historyList = document.getElementById('history-list');
         let selectedWords = [];
         let utterance = new SpeechSynthesisUtterance();
+        let readingHistory = [];
 
         words.forEach(word => {
             const button = document.createElement('button');
@@ -68,14 +93,40 @@
 
         readButton.addEventListener('click', () => {
             if (selectedWords.length > 0) {
-                utterance.text = selectedWords.join(' ');
+                const selectedPhrase = selectedWords.join(' ');
+                utterance.text = selectedPhrase;
                 speechSynthesis.speak(utterance);
+                addToHistory(selectedPhrase);
             }
         });
 
         stopButton.addEventListener('click', () => {
             speechSynthesis.cancel();
         });
+
+        function addToHistory(phrase) {
+            readingHistory.push(phrase);
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            readingHistory.forEach((phrase, index) => {
+                const li = document.createElement('li');
+                li.textContent = phrase;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.addEventListener('click', () => deleteHistoryItem(index));
+                li.appendChild(deleteBtn);
+                historyList.appendChild(li);
+            });
+        }
+
+        function deleteHistoryItem(index) {
+            readingHistory.splice(index, 1);
+            updateHistoryDisplay();
+        }
     </script>
 </body>
 </html>
