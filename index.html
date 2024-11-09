@@ -16,6 +16,10 @@
             width: 100%;
             max-width: 600px;
             margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         #sentence-list {
             width: 100%;
@@ -88,7 +92,6 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 3px;
-            margin-left: 5px;
         }
         .read-history-btn, .use-sentence-btn {
             background-color: #2196F3;
@@ -105,11 +108,13 @@
 
     <h2>Current Sentence:</h2>
     <div id="sentence-container"></div>
+    
     <div id="controls">
         <button id="read-button">Read Selected</button>
         <button id="stop-button">Stop</button>
         <button id="reset-button">Reset Selected Words</button>
     </div>
+
     <div id="history">
         <h3>Reading History</h3>
         <ul id="history-list"></ul>
@@ -129,7 +134,7 @@
         let selectedWords = [];
         let utterance = new SpeechSynthesisUtterance();
         let readingHistory = [];
-        let savedSentences = [];
+        let savedSentences = JSON.parse(localStorage.getItem('savedSentences')) || [];
 
         addSentenceButton.addEventListener('click', addSentence);
 
@@ -138,6 +143,7 @@
             if (newSentence) {
                 savedSentences.push(newSentence);
                 updateSentenceList();
+                saveSentencesToLocalStorage();
                 sentenceInput.value = '';
             }
         }
@@ -172,6 +178,7 @@
         function deleteSentence(index) {
             savedSentences.splice(index, 1);
             updateSentenceList();
+            saveSentencesToLocalStorage();
         }
 
         function updateSentenceDisplay() {
@@ -258,6 +265,15 @@
                 button.classList.remove('selected');
             });
         }
+
+        function saveSentencesToLocalStorage() {
+            localStorage.setItem('savedSentences', JSON.stringify(savedSentences));
+        }
+
+        // 페이지 로드 시 저장된 문장 불러오기
+        window.addEventListener('load', () => {
+            updateSentenceList();
+        });
     </script>
 </body>
 </html>
