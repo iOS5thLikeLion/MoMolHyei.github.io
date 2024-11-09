@@ -1,14 +1,81 @@
-Hello, world!
-<html>
-    <head>
-        <title>
-            MoMolHyei
-        </title>
-    </head>
-    <body>
-        Hello! This is the first page on my final project
-        <script>
-            document.write("Live Like Lion")
-        </script>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Reader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .word-button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="sentence-container"></div>
+    <div id="controls">
+        <button id="read-button">Read Selected</button>
+        <button id="stop-button">Stop</button>
+    </div>
+
+    <script>
+        const sentence = "You can't let people walk all over you";
+        const words = sentence.split(' ');
+        const sentenceContainer = document.getElementById('sentence-container');
+        const readButton = document.getElementById('read-button');
+        const stopButton = document.getElementById('stop-button');
+        let selectedWords = [];
+        let utterance = new SpeechSynthesisUtterance();
+
+        words.forEach(word => {
+            const button = document.createElement('button');
+            button.textContent = word;
+            button.classList.add('word-button');
+            button.addEventListener('click', () => toggleWord(button, word));
+            sentenceContainer.appendChild(button);
+        });
+
+        function toggleWord(button, word) {
+            button.classList.toggle('selected');
+            const index = selectedWords.indexOf(word);
+            if (index > -1) {
+                selectedWords.splice(index, 1);
+            } else {
+                selectedWords.push(word);
+            }
+        }
+
+        readButton.addEventListener('click', () => {
+            if (selectedWords.length > 0) {
+                utterance.text = selectedWords.join(' ');
+                speechSynthesis.speak(utterance);
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            speechSynthesis.cancel();
+        });
+    </script>
+</body>
 </html>
