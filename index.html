@@ -48,6 +48,12 @@
             border: none;
             border-radius: 5px;
         }
+        #reset-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
         #history-list {
             list-style-type: none;
             padding: 0;
@@ -76,6 +82,7 @@
     <div id="controls">
         <button id="read-button">Read Selected</button>
         <button id="stop-button">Stop</button>
+        <button id="reset-button">Reset Selected Words</button>
     </div>
     <div id="history">
         <h3>Reading History</h3>
@@ -88,7 +95,9 @@
         const sentenceContainer = document.getElementById('sentence-container');
         const readButton = document.getElementById('read-button');
         const stopButton = document.getElementById('stop-button');
+        const resetButton = document.getElementById('reset-button');
         const historyList = document.getElementById('history-list');
+        
         let selectedWords = [];
         let utterance = new SpeechSynthesisUtterance();
         let readingHistory = [];
@@ -104,49 +113,41 @@
         function toggleWord(button, word) {
             button.classList.toggle('selected');
             const index = selectedWords.indexOf(word);
+            
             if (index > -1) {
                 selectedWords.splice(index, 1);
-            } else {
-                selectedWords.push(word);
-            }
-        }
+                button.classList.remove('selected'); // Remove the selection visually
+                button.style.backgroundColor = '#f0f0f0'; // Reset the background color
+                button.style.color = 'black'; // Reset the text color
+                return; // Exit if already selected
+            } 
+            
+             // Add word to selection
+             selectedWords.push(word);
+             button.style.backgroundColor = '#4CAF50'; // Change the background color to indicate selection
+             button.style.color = 'white'; // Change text color for visibility
+         }
 
-        readButton.addEventListener('click', () => {
-            if (selectedWords.length > 0) {
-                const selectedPhrase = selectedWords.join(' ');
-                utterance.text = selectedPhrase;
-                speechSynthesis.speak(utterance);
-                addToHistory(selectedPhrase);
-            }
-        });
+         readButton.addEventListener('click', () => {
+             if (selectedWords.length > 0) {
+                 const selectedPhrase = selectedWords.join(' ');
+                 utterance.text = selectedPhrase; 
+                 speechSynthesis.speak(utterance);
+                 addToHistory(selectedPhrase);
+             }
+         });
 
-        stopButton.addEventListener('click', () => {
-            speechSynthesis.cancel();
-        });
+         stopButton.addEventListener('click', () => {
+             speechSynthesis.cancel();
+         });
 
-        function addToHistory(phrase) {
-            readingHistory.push(phrase);
-            updateHistoryDisplay();
-        }
+         resetButton.addEventListener('click', () => {
+             resetSelectedWords();
+         });
 
-        function updateHistoryDisplay() {
-            historyList.innerHTML = '';
-            readingHistory.forEach((phrase, index) => {
-                const li = document.createElement('li');
-                li.textContent = phrase;
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.addEventListener('click', () => deleteHistoryItem(index));
-                li.appendChild(deleteBtn);
-                historyList.appendChild(li);
-            });
-        }
+         function addToHistory(phrase) {
+             readingHistory.push(phrase);
+             updateHistoryDisplay();
+         }
 
-        function deleteHistoryItem(index) {
-            readingHistory.splice(index, 1);
-            updateHistoryDisplay();
-        }
-    </script>
-</body>
-</html>
+         function
