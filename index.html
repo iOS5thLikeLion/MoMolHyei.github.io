@@ -67,13 +67,17 @@
             align-items: center;
             border-radius: 5px;
         }
-        .delete-btn {
+        .delete-btn, .read-history-btn {
             background-color: #ff4444;
             color: white;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 3px;
+            margin-left: 5px;
+        }
+        .read-history-btn {
+            background-color: #2196F3;
         }
     </style>
 </head>
@@ -113,41 +117,74 @@
         function toggleWord(button, word) {
             button.classList.toggle('selected');
             const index = selectedWords.indexOf(word);
-            
             if (index > -1) {
                 selectedWords.splice(index, 1);
-                button.classList.remove('selected'); // Remove the selection visually
-                button.style.backgroundColor = '#f0f0f0'; // Reset the background color
-                button.style.color = 'black'; // Reset the text color
-                return; // Exit if already selected
-            } 
-            
-             // Add word to selection
-             selectedWords.push(word);
-             button.style.backgroundColor = '#4CAF50'; // Change the background color to indicate selection
-             button.style.color = 'white'; // Change text color for visibility
-         }
+            } else {
+                selectedWords.push(word);
+            }
+        }
 
-         readButton.addEventListener('click', () => {
-             if (selectedWords.length > 0) {
-                 const selectedPhrase = selectedWords.join(' ');
-                 utterance.text = selectedPhrase; 
-                 speechSynthesis.speak(utterance);
-                 addToHistory(selectedPhrase);
-             }
-         });
+        readButton.addEventListener('click', () => {
+            if (selectedWords.length > 0) {
+                const selectedPhrase = selectedWords.join(' ');
+                utterance.text = selectedPhrase;
+                speechSynthesis.speak(utterance);
+                addToHistory(selectedPhrase);
+            }
+        });
 
-         stopButton.addEventListener('click', () => {
-             speechSynthesis.cancel();
-         });
+        stopButton.addEventListener('click', () => {
+            speechSynthesis.cancel();
+        });
 
-         resetButton.addEventListener('click', () => {
-             resetSelectedWords();
-         });
+        resetButton.addEventListener('click', () => {
+            resetSelectedWords();
+        });
 
-         function addToHistory(phrase) {
-             readingHistory.push(phrase);
-             updateHistoryDisplay();
-         }
+        function addToHistory(phrase) {
+            readingHistory.push(phrase);
+            updateHistoryDisplay();
+        }
 
-         function
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            readingHistory.forEach((phrase, index) => {
+                const li = document.createElement('li');
+                li.textContent = phrase;
+
+                const readBtn = document.createElement('button');
+                readBtn.textContent = 'Read';
+                readBtn.classList.add('read-history-btn');
+                readBtn.addEventListener('click', () => readFromHistory(phrase));
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.addEventListener('click', () => deleteHistoryItem(index));
+
+                li.appendChild(readBtn);
+                li.appendChild(deleteBtn);
+                historyList.appendChild(li);
+            });
+        }
+
+        function deleteHistoryItem(index) {
+            readingHistory.splice(index, 1);
+            updateHistoryDisplay();
+        }
+
+        function readFromHistory(phrase) {
+            utterance.text = phrase;
+            speechSynthesis.speak(utterance);
+        }
+
+        function resetSelectedWords() {
+            selectedWords = [];
+            const buttons = document.querySelectorAll('.word-button');
+            buttons.forEach(button => {
+                button.classList.remove('selected');
+            });
+        }
+    </script>
+</body>
+</html>
